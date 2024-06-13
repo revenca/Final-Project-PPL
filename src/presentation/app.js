@@ -1,7 +1,6 @@
-// my-project/presentation/app.js
-
 import { productService } from '../application/productService.js';
 import { calculateBill } from '../business/billCalculator.js';
+import { receiptService } from '../application/receiptService.js';
 
 $(document).ready(function() {
     const menuList = $('#menu-list');
@@ -23,11 +22,10 @@ $(document).ready(function() {
         menuList.empty();
         products.forEach(product => {
             menuList.append(`
-                <tr data-id="${product.id}">
+                <tr data-id="${product.id}" data-category="${product.category}">
                     <td>${product.name}</td>
                     <td>${product.id}</td>
                     <td>Rp. ${product.price}</td>
-
                 </tr>
             `);
         });
@@ -76,7 +74,6 @@ $(document).ready(function() {
         $(this).addClass('selected');
     });
 
-    // Update the event handler for the delete button in the bill list
     billList.on('click', '.delete-bill-item', function() {
         $(this).closest('tr').remove();
         updateBill();
@@ -99,12 +96,13 @@ $(document).ready(function() {
     });
 
     $('.order-type').click(function() {
-        $('.order-type').removeClass('active');
-        $(this).addClass('active');
+        $('.order-type').removeClass('active btn-primary').addClass('btn-secondary');
+        $(this).addClass('active btn-primary').removeClass('btn-secondary');
     });
 
-    $('#close-admin').click(function() {
-        $('#admin-panel').hide();
+    $('.dropdown-item').click(function() {
+        const paymentMethod = $(this).text();
+        $('#paymentDropdown').text(paymentMethod);
     });
 
     $('#add-product-form').submit(async function(e) {
@@ -112,15 +110,92 @@ $(document).ready(function() {
         const name = $('#product-name').val();
         const id = $('#product-id').val();
         const price = parseInt($('#product-price').val());
+        const category = $('#product-category').val();
 
         try {
-            await productService.addProduct({ name, id, price });
+            await productService.addProduct({ name, id, price, category });
             $('#admin-panel').hide();
             fetchProducts();
         } catch (error) {
             alert('Error adding product: ' + error.message);
         }
     });
+
+    $('#filter-all').click(function() {
+        filterProducts('all');
+    });
+
+    $('#filter-coffee').click(function() {
+        filterProducts('coffee');
+    });
+
+    $('#filter-non-coffee').click(function() {
+        filterProducts('non-coffee');
+    });
+
+    $('#filter-food').click(function() {
+        filterProducts('food');
+    });
+
+    function filterProducts(category) {
+        if (category === 'all') {
+            menuList.find('tr').show();
+        } else {
+            menuList.find('tr').each(function() {
+                const productCategory = $(this).data('category');
+                if (productCategory === category) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+    }
+
+    $('.checkout-button').click(async function() {
+        const billItems = [];
+        $('#bill-list').find('tr').each(function() {
+            const name = $(this).find('td:nth-child(1)').text();
+            const qty = parseInt($(this).find('.qty').text());
+            const price = parseInt($(this).find('.price').text().replace('Rp. ', ''));
+            billItems.push({ name, qty, price });
+        });
+
+        const subtotal = parseInt($('#subtotal').text());
+        const ppn = parseInt($('#ppn').text());
+        const total = parseInt($('#total').text());
+        const orderType = $('.order-type.active').text();
+        const paymentMethod = $('#paymentDropdown').text();
+        const date = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        const receiptId = await generateReceiptId();
+
+        const receiptData = {
+            receiptId,
+            items: billItems,
+            subtotal,
+            ppn,
+            total,
+            orderType,
+            paymentMethod,
+            date
+        };
+
+        await receiptService.addOrder(receiptData);
+
+        window.location.href = `receipt.html?receiptId=${receiptId}`;
+    });
+
+    async function generateReceiptId() {
+        try {
+            const response = await fetch('http://localhost:3000/api/receipt-id');
+            const data = await response.json();
+            return data.receiptId;
+        } catch (error) {
+            console.error('Error generating receipt ID:', error);
+            return null;
+        }
+    }
 
     fetchProducts();
 });
