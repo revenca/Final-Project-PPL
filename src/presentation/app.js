@@ -1,21 +1,12 @@
-import productService from '../application/productService.js';
+import { productService } from '../application/productService.js';
+import { calculateBill } from '../business/billCalculator.js';
 
 $(document).ready(function() {
     const menuList = $('#menu-list');
-
-    function updateMenu(products) {
-        menuList.empty();
-        products.forEach(product => {
-            menuList.append(`
-                <tr data-id="${product.id}">
-                    <td>${product.name}</td>
-                    <td>${product.id}</td>
-                    <td>Rp. ${product.price}</td>
-                    <td><button class="delete-product">Delete</button></td>
-                </tr>
-            `);
-        });
-    }
+    const billList = $('#bill-list');
+    const subtotalElem = $('#subtotal');
+    const ppnElem = $('#ppn');
+    const totalElem = $('#total');
 
     async function fetchProducts() {
         try {
@@ -26,14 +17,33 @@ $(document).ready(function() {
         }
     }
 
-    // Define this function to be called from admin window
-    window.refreshMenuList = fetchProducts;
+    function updateMenu(products) {
+        menuList.empty();
+        products.forEach(product => {
+            menuList.append(`
+                <tr data-id="${product.id}">
+                    <td>${product.name}</td>
+                    <td>${product.id}</td>
+                    <td>Rp. ${product.price}</td>
 
-    fetchProducts();
+                </tr>
+            `);
+        });
+    }
 
-    $('#admin-button').click(function() {
-        window.location.href = '/admin'; // Direct navigation
-    });
+    function updateBill() {
+        const billItems = [];
+        billList.find('tr').each(function() {
+            const qty = parseInt($(this).find('.qty').text());
+            const price = parseInt($(this).find('.price').text().replace('Rp. ', ''));
+            billItems.push({ qty, price });
+        });
+
+        const { subtotal, ppn, total } = calculateBill(billItems);
+        subtotalElem.text(subtotal);
+        ppnElem.text(ppn);
+        totalElem.text(total);
+    }
 
     $('.add-button').click(function() {
         const selectedRow = menuList.find('tr.selected');
@@ -47,11 +57,12 @@ $(document).ready(function() {
         const qty = parseInt($('.quantity-selector input').val());
 
         if (productId) {
-            $('#bill-list').append(`
+            billList.append(`
                 <tr>
                     <td>${productName}</td>
                     <td class="qty">${qty}</td>
                     <td class="price">Rp. ${productPrice}</td>
+                    <td><button class="delete-bill-item">Delete</button></td>
                 </tr>
             `);
             updateBill();
@@ -63,33 +74,11 @@ $(document).ready(function() {
         $(this).addClass('selected');
     });
 
-    menuList.on('click', '.delete-product', async function(e) {
-        e.stopPropagation();
-        const productId = $(this).closest('tr').data('id');
-
-        try {
-            await productService.deleteProduct(productId);
-            fetchProducts(); // Refresh menu list
-        } catch (error) {
-            alert('Error deleting product: ' + error.message);
-        }
+    // Update the event handler for the delete button in the bill list
+    billList.on('click', '.delete-bill-item', function() {
+        $(this).closest('tr').remove();
+        updateBill();
     });
-
-    function updateBill() {
-        let subtotal = 0;
-        $('#bill-list tr').each(function() {
-            const qty = parseInt($(this).find('.qty').text());
-            const price = parseInt($(this).find('.price').text().replace('Rp. ', ''));
-            subtotal += qty * price;
-        });
-
-        const ppn = subtotal * 0.1;
-        const total = subtotal + ppn;
-
-        $('#subtotal').text(subtotal);
-        $('#ppn').text(ppn);
-        $('#total').text(total);
-    }
 
     $('.quantity-selector .decrease').click(function() {
         const input = $('.quantity-selector input');
@@ -107,9 +96,30 @@ $(document).ready(function() {
         input.val(value);
     });
 
-    // Set current date
-    const dateElement = $('#current-date');
-    const currentDate = new Date();
-    const options = { day: 'numeric', month: 'long', year: 'numeric' };
-    dateElement.text(currentDate.toLocaleDateString('id-ID', options));
+    $('.order-type').click(function() {
+        $('.order-type').removeClass('active');
+        $(this).addClass('active');
+    });
+
+    $('#close-admin').click(function() {
+        $('#admin-panel').hide();
+    });
+
+    $('#add-product-form').submit(async function(e) {
+        e.preventDefault();
+        const name = $('#product-name').val();
+        const id = $('#product-id').val();
+        const price = parseInt($('#product-price').val());
+
+        try {
+            await productService.addProduct({ name, id, price });
+            $('#admin-panel').hide();
+            fetchProducts();
+        } catch (error) {
+            alert('Error adding product: ' + error.message);
+        }
+    });
+
+    fetchProducts();
 });
+
