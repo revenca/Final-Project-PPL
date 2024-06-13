@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kasir Dashboard</title>
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -74,6 +72,16 @@
                         <p>PPN: Rp. <span id="ppn">0</span></p>
                         <p>Total: Rp. <span id="total">0</span></p>
                     </div>
+                    <div class="dropdown mt-3">
+                        <button class="btn btn-info dropdown-toggle" type="button" id="paymentDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Choose Payment
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="paymentDropdown">
+                            <a class="dropdown-item" href="#" id="payment-cash">Cash</a>
+                            <a class="dropdown-item" href="#" id="payment-debit">Debit</a>
+                            <a class="dropdown-item" href="#" id="payment-qris">QRIS</a>
+                        </div>
+                    </div>
                     <button class="checkout-button btn btn-success mt-3">Checkout</button>
                 </div>
             </div>
@@ -97,9 +105,8 @@
         </form>
     </div>
 
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script type="module" src="../application/productService.js"></script>
     <script type="module" src="../business/billCalculator.js"></script>
@@ -111,6 +118,14 @@
             const options = { day: 'numeric', month: 'long', year: 'numeric' };
             dateElement.textContent = currentDate.toLocaleDateString('id-ID', options);
         });
+
+        $(document).ready(function() {
+            $('.dropdown-item').click(function() {
+                const paymentMethod = $(this).text();
+                $('#paymentDropdown').text(paymentMethod);
+            });
+        });
     </script>
 </body>
 </html>
+
