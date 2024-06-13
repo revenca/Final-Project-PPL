@@ -7,7 +7,9 @@ const productRepository = {
         db.all(`SELECT * FROM products`, [], callback);
     },
     add: function(product, callback) {
-        db.run(`INSERT INTO products (id, name, price) VALUES (?, ?, ?)`, [product.id, product.name, product.price], callback);
+        const { id, name, price, category } = product;
+        db.run(`INSERT INTO products (id, name, price, category) VALUES (?, ?, ?, ?)`,
+            [id, name, price, category], callback);
     },
     delete: function(productId, callback) {
         db.run(`DELETE FROM products WHERE id = ?`, [productId], callback);
