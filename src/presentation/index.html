@@ -124,6 +124,11 @@
                 const paymentMethod = $(this).text();
                 $('#paymentDropdown').text(paymentMethod);
             });
+
+            $('.category').click(function() {
+                $('.category').removeClass('active');
+                $(this).addClass('active');
+            });
         });
     </script>
 </body>
