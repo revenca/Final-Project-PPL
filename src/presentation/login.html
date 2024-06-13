@@ -16,32 +16,29 @@
         </form>
         <div id="login-message"></div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+    <script type="module">
+        import { userService } from '../application/userService.js';
+
         $(document).ready(function() {
-            $('#login-form').submit(function(e) {
+            $('#login-form').submit(async function(e) {
                 e.preventDefault();
                 const username = $('#username').val();
                 const password = $('#password').val();
 
-                $.ajax({
-                    url: '/api/login',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ username, password }),
-                    success: function(response) {
-                        $('#login-message').text(response.message);
-                        if (response.message === 'Login successful') {
-                            window.location.href = '/admin';
-                        }
-                    },
-                    error: function(error) {
-                        $('#login-message').text('Login failed: ' + error.responseJSON.error);
+                try {
+                    const response = await userService.login({ username, password });
+                    $('#login-message').text(response.message);
+                    if (response.message === 'Login successful') {
+                        console.log('Redirecting to http://localhost:8080/presentation/admin.html'); // Debugging statement
+                        window.location.href = "http://localhost:8080/presentation/admin.html"; // Redirect to admin page on successful login
                     }
-                });
+                } catch (error) {
+                    $('#login-message').text('Login failed: ' + error.message);
+                }
             });
         });
     </script>
 </body>
 </html>
+
