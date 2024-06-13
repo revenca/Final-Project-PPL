@@ -1,3 +1,5 @@
+// my-project/infrastructure/server.js
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -11,8 +13,8 @@ const db = require('./db');
 const app = express();
 const PORT = 3000;
 
-app.use(cors()); // Enable CORS for all routes
-app.use(bodyParser.json()); // Ensure body-parser middleware is used
+app.use(cors());
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../presentation')));
 app.use(session({
     secret: 'secret-key',
@@ -99,15 +101,6 @@ app.delete('/api/products/:id', (req, res) => {
         }
         res.json({ message: 'Product deleted successfully' });
     });
-});
-
-app.get('/admin', (req, res) => {
-    if (req.session.admin) {
-        console.log('Accessing admin page with session:', req.session);
-        res.sendFile(path.join(__dirname, '../presentation/admin.html'));
-    } else {
-        res.status(401).send('Unauthorized');
-    }
 });
 
 app.get('/', (req, res) => {
