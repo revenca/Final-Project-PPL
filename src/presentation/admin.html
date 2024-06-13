@@ -1,159 +1,120 @@
-// my-project/presentation/app.js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="admin-container container">
+        <h3>Admin Dashboard</h3>
+        <button id="home-button" class="btn btn-primary">Home</button>
+        <div class="add-product-form">
+            <h4>Add New Product</h4>
+            <form id="add-product-form">
+                <input type="text" id="product-name" placeholder="Product Name" required class="form-control">
+                <input type="text" id="product-id" placeholder="Product ID" required class="form-control">
+                <input type="number" id="product-price" placeholder="Product Price" required class="form-control">
+                <select id="product-category" required class="form-control">
+                    <option value="" disabled selected>Select Category</option>
+                    <option value="coffee">Coffee</option>
+                    <option value="non-coffee">Non-Coffee</option>
+                    <option value="food">Food</option>
+                </select>
+                <button type="submit" class="btn btn-success mt-3">Add Product</button>
+            </form>
+        </div>
+        <div class="product-list">
+            <h4>Product List</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>PRODUCT NAME</th>
+                        <th>PRODUCT ID</th>
+                        <th>PRICE</th>
+                        <th>CATEGORY</th>
+                        <th>DELETE</th>
+                    </tr>
+                </thead>
+                <tbody id="product-list">
+                    <!-- Product items will be dynamically generated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script type="module">
+        import { productService } from '../application/productService.js';
 
-import { productService } from '../application/productService.js';
-import { calculateBill } from '../business/billCalculator.js';
+        $(document).ready(function() {
+            async function loadProducts() {
+                try {
+                    const products = await productService.getProducts();
+                    updateProductList(products);
+                } catch (error) {
+                    console.error('Error loading products:', error);
+                }
+            }
 
-$(document).ready(function() {
-    const menuList = $('#menu-list');
-    const billList = $('#bill-list');
-    const subtotalElem = $('#subtotal');
-    const ppnElem = $('#ppn');
-    const totalElem = $('#total');
+            function updateProductList(products) {
+                const productList = $('#product-list');
+                productList.empty();
+                products.forEach(product => {
+                    productList.append(`
+                        <tr data-id="${product.id}">
+                            <td>${product.name}</td>
+                            <td>${product.id}</td>
+                            <td>Rp. ${product.price}</td>
+                            <td>${product.category}</td>
+                            <td><button class="delete-product btn btn-danger">Delete</button></td>
+                        </tr>
+                    `);
+                });
+            }
 
-    async function fetchProducts() {
-        try {
-            const products = await productService.getProducts();
-            updateMenu(products);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
-    }
+            $('#add-product-form').submit(async function(e) {
+                e.preventDefault();
+                const name = $('#product-name').val();
+                const id = $('#product-id').val();
+                const price = parseInt($('#product-price').val());
+                const category = $('#product-category').val();
 
-    function updateMenu(products) {
-        menuList.empty();
-        products.forEach(product => {
-            menuList.append(`
-                <tr data-id="${product.id}" data-category="${product.category}">
-                    <td>${product.name}</td>
-                    <td>${product.id}</td>
-                    <td>Rp. ${product.price}</td>
-                </tr>
-            `);
-        });
-    }
-
-    function updateBill() {
-        const billItems = [];
-        billList.find('tr').each(function() {
-            const qty = parseInt($(this).find('.qty').text());
-            const price = parseInt($(this).find('.price').text().replace('Rp. ', ''));
-            billItems.push({ qty, price });
-        });
-
-        const { subtotal, ppn, total } = calculateBill(billItems);
-        subtotalElem.text(subtotal);
-        ppnElem.text(ppn);
-        totalElem.text(total);
-    }
-
-    $('.add-button').click(function() {
-        const selectedRow = menuList.find('tr.selected');
-        if (selectedRow.length === 0) {
-            alert('Please select a product first.');
-            return;
-        }
-        const productId = selectedRow.data('id');
-        const productName = selectedRow.find('td:first-child').text();
-        const productPrice = parseInt(selectedRow.find('td:nth-child(3)').text().replace('Rp. ', ''));
-        const qty = parseInt($('.quantity-selector input').val());
-
-        if (productId) {
-            billList.append(`
-                <tr>
-                    <td>${productName}</td>
-                    <td class="qty">${qty}</td>
-                    <td class="price">Rp. ${productPrice}</td>
-                    <td><button class="delete-bill-item">Delete</button></td>
-                </tr>
-            `);
-            updateBill();
-        }
-    });
-
-    menuList.on('click', 'tr', function() {
-        menuList.find('tr').removeClass('selected');
-        $(this).addClass('selected');
-    });
-
-    // Update the event handler for the delete button in the bill list
-    billList.on('click', '.delete-bill-item', function() {
-        $(this).closest('tr').remove();
-        updateBill();
-    });
-
-    $('.quantity-selector .decrease').click(function() {
-        const input = $('.quantity-selector input');
-        let value = parseInt(input.val());
-        if (value > 1) {
-            value--;
-            input.val(value);
-        }
-    });
-
-    $('.quantity-selector .increase').click(function() {
-        const input = $('.quantity-selector input');
-        let value = parseInt(input.val());
-        value++;
-        input.val(value);
-    });
-
-    $('.order-type').click(function() {
-        $('.order-type').removeClass('active');
-        $(this).addClass('active');
-    });
-
-    $('#close-admin').click(function() {
-        $('#admin-panel').hide();
-    });
-
-    $('#add-product-form').submit(async function(e) {
-        e.preventDefault();
-        const name = $('#product-name').val();
-        const id = $('#product-id').val();
-        const price = parseInt($('#product-price').val());
-        const category = $('#product-category').val();
-
-        try {
-            await productService.addProduct({ name, id, price, category });
-            $('#admin-panel').hide();
-            fetchProducts();
-        } catch (error) {
-            alert('Error adding product: ' + error.message);
-        }
-    });
-
-    $('#filter-all').click(function() {
-        filterProducts('all');
-    });
-
-    $('#filter-coffee').click(function() {
-        filterProducts('coffee');
-    });
-
-    $('#filter-non-coffee').click(function() {
-        filterProducts('non-coffee');
-    });
-
-    $('#filter-food').click(function() {
-        filterProducts('food');
-    });
-
-    function filterProducts(category) {
-        if (category === 'all') {
-            menuList.find('tr').show();
-        } else {
-            menuList.find('tr').each(function() {
-                const productCategory = $(this).data('category');
-                if (productCategory === category) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
+                try {
+                    await productService.addProduct({ name, id, price, category });
+                    loadProducts();
+                    $('#product-name').val('');
+                    $('#product-id').val('');
+                    $('#product-price').val('');
+                    $('#product-category').val('');
+                } catch (error) {
+                    console.error('Error adding product:', error);
                 }
             });
-        }
-    }
 
-    fetchProducts();
-});
+            $('#product-list').on('click', '.delete-product', async function() {
+                const productId = $(this).closest('tr').data('id');
+                try {
+                    await productService.deleteProduct(productId);
+                    loadProducts();
+                } catch (error) {
+                    console.error('Error deleting product:', error);
+                }
+            });
 
+            $('#home-button').click(function() {
+                window.location.href = 'http://localhost:8080/presentation/index.html';
+            });
+
+            loadProducts();
+        });
+    </script>
+</body>
+</html>
 
