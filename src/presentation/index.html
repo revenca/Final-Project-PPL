@@ -22,7 +22,7 @@
                         <th>PRODUCT NAME</th>
                         <th>PRODUCT ID</th>
                         <th>PRICE</th>
-                        <th>DELETE</th>
+                        <!-- <th>DELETE</th> -->
                     </tr>
                 </thead>
                 <tbody id="menu-list">
@@ -43,7 +43,7 @@
                     <p>Vanessa Christie</p>
                 </div>
                 <div class="date" id="current-date"></div>
-                <button id="admin-button">Admin</button>
+                <button id="admin-button" onclick="window.open('login.html', '_blank')">Admin</button>
             </div>
             <div class="order-info">
                 <button class="order-type active">Dine-In</button>
@@ -57,6 +57,7 @@
                             <th>PRODUCT NAME</th>
                             <th>QTY</th>
                             <th>PRICE</th>
+                            <th>DELETE</th>
                         </tr>
                     </thead>
                     <tbody id="bill-list">
@@ -73,17 +74,28 @@
         </div>
     </div>
 
+    <div class="admin-panel" id="admin-panel" style="display: none;">
+        <h3>Admin Panel</h3>
+        <button id="close-admin">Close</button>
+        <h4>Add New Product</h4>
+        <form id="add-product-form">
+            <input type="text" id="product-name" placeholder="Product Name" required>
+            <input type="text" id="product-id" placeholder="Product ID" required>
+            <input type="number" id="product-price" placeholder="Product Price" required>
+            <button type="submit">Add Product</button>
+        </form>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="../application/productService.js"></script>
+    <script type="module" src="../business/billCalculator.js"></script>
+    <script type="module" src="app.js"></script>
     <script>
-        $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
             const dateElement = document.getElementById('current-date');
             const currentDate = new Date();
             const options = { day: 'numeric', month: 'long', year: 'numeric' };
             dateElement.textContent = currentDate.toLocaleDateString('id-ID', options);
-        });
-
-        $('#admin-button').click(function() {
-            window.location.href = '/admin';
         });
     </script>
 </body>
