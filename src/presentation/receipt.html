@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid pt-5">
+        <h1 class="text-center">Receipt</h1>
+        <h2 class="text-center">ID:<span id="receipt-id"></span></h2>
+        <table class="table table-borderless">
+            <thead>
+                <tr>
+                    <th>PRODUCT NAME</th>
+                    <th>QTY</th>
+                    <th>PRICE</th>
+                </tr>
+            </thead>
+            <tbody id="receipt-items">
+                <!-- Receipt items will be dynamically generated here -->
+            </tbody>
+        </table>
+        <div class="summary">
+            <p><strong>Subtotal:</strong> Rp. <span id="receipt-subtotal">0</span></p>
+            <p><strong>PPN:</strong> Rp. <span id="receipt-ppn">0</span></p>
+            <p><strong>Total:</strong> Rp. <span id="receipt-total">0</span></p>
+        </div>
+        <div class="order-info">
+            <p><strong>Order Type:</strong> <span id="receipt-order-type"></span></p>
+            <p><strong>Payment Method:</strong> <span id="receipt-payment-method"></span></p>
+            <p><strong>Date of Order:</strong> <span id="receipt-date"></span></p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script type="module">
+        import { receiptService } from '../application/receiptService.js';
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const receiptId = urlParams.get('receiptId');
+
+            if (!receiptId) {
+                alert('No receipt ID provided');
+                return;
+            }
+
+            try {
+                const receiptData = await receiptService.getOrder(receiptId);
+                $('#receipt-id').text(receiptData.receiptId);
+                $('#receipt-subtotal').text(receiptData.subtotal);
+                $('#receipt-ppn').text(receiptData.ppn);
+                $('#receipt-total').text(receiptData.total);
+                $('#receipt-order-type').text(receiptData.orderType);
+                $('#receipt-payment-method').text(receiptData.paymentMethod);
+                $('#receipt-date').text(receiptData.date);
+
+                const receiptItems = JSON.parse(receiptData.items);
+                receiptItems.forEach(item => {
+                    $('#receipt-items').append(`
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.qty}</td>
+                            <td>Rp. ${item.price}</td>
+                        </tr>
+                    `);
+                });
+            } catch (error) {
+                console.error('Error loading receipt:', error);
+                alert('Failed to load receipt');
+            }
+        });
+    </script>
+</body>
+</html>
