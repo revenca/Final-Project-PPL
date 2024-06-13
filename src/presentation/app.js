@@ -1,21 +1,7 @@
-import calculateBill from '../business/billCalculator.js';
 import productService from '../application/productService.js';
 
 $(document).ready(function() {
     const menuList = $('#menu-list');
-    const billList = $('#bill-list');
-    const subtotalElem = $('#subtotal');
-    const ppnElem = $('#ppn');
-    const totalElem = $('#total');
-
-    async function fetchProducts() {
-        try {
-            const products = await productService.getProducts();
-            updateMenu(products);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
-    }
 
     function updateMenu(products) {
         menuList.empty();
@@ -31,19 +17,23 @@ $(document).ready(function() {
         });
     }
 
-    function updateBill() {
-        const billItems = [];
-        billList.find('tr').each(function() {
-            const qty = parseInt($(this).find('.qty').text());
-            const price = parseInt($(this).find('.price').text().replace('Rp. ', ''));
-            billItems.push({ qty, price });
-        });
-
-        const { subtotal, ppn, total } = calculateBill(billItems);
-        subtotalElem.text(subtotal);
-        ppnElem.text(ppn);
-        totalElem.text(total);
+    async function fetchProducts() {
+        try {
+            const products = await productService.getProducts();
+            updateMenu(products);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
     }
+
+    // Define this function to be called from admin window
+    window.refreshMenuList = fetchProducts;
+
+    fetchProducts();
+
+    $('#admin-button').click(function() {
+        window.location.href = '/admin'; // Direct navigation
+    });
 
     $('.add-button').click(function() {
         const selectedRow = menuList.find('tr.selected');
@@ -57,7 +47,7 @@ $(document).ready(function() {
         const qty = parseInt($('.quantity-selector input').val());
 
         if (productId) {
-            billList.append(`
+            $('#bill-list').append(`
                 <tr>
                     <td>${productName}</td>
                     <td class="qty">${qty}</td>
@@ -79,11 +69,27 @@ $(document).ready(function() {
 
         try {
             await productService.deleteProduct(productId);
-            fetchProducts();
+            fetchProducts(); // Refresh menu list
         } catch (error) {
             alert('Error deleting product: ' + error.message);
         }
     });
+
+    function updateBill() {
+        let subtotal = 0;
+        $('#bill-list tr').each(function() {
+            const qty = parseInt($(this).find('.qty').text());
+            const price = parseInt($(this).find('.price').text().replace('Rp. ', ''));
+            subtotal += qty * price;
+        });
+
+        const ppn = subtotal * 0.1;
+        const total = subtotal + ppn;
+
+        $('#subtotal').text(subtotal);
+        $('#ppn').text(ppn);
+        $('#total').text(total);
+    }
 
     $('.quantity-selector .decrease').click(function() {
         const input = $('.quantity-selector input');
@@ -101,29 +107,9 @@ $(document).ready(function() {
         input.val(value);
     });
 
-    $('.order-type').click(function() {
-        $('.order-type').removeClass('active');
-        $(this).addClass('active');
-    });
-
-    $('#close-admin').click(function() {
-        $('#admin-panel').hide();
-    });
-
-    $('#add-product-form').submit(async function(e) {
-        e.preventDefault();
-        const name = $('#product-name').val();
-        const id = $('#product-id').val();
-        const price = parseInt($('#product-price').val());
-
-        try {
-            await productService.addProduct({ name, id, price });
-            $('#admin-panel').hide();
-            fetchProducts();
-        } catch (error) {
-            alert('Error adding product: ' + error.message);
-        }
-    });
-
-    fetchProducts();
+    // Set current date
+    const dateElement = $('#current-date');
+    const currentDate = new Date();
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    dateElement.text(currentDate.toLocaleDateString('id-ID', options));
 });

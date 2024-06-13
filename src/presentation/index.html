@@ -43,7 +43,7 @@
                     <p>Vanessa Christie</p>
                 </div>
                 <div class="date" id="current-date"></div>
-                <button id="admin-button" onclick="window.open('login.html', '_blank')">Admin</button>
+                <button id="admin-button">Admin</button>
             </div>
             <div class="order-info">
                 <button class="order-type active">Dine-In</button>
@@ -73,28 +73,17 @@
         </div>
     </div>
 
-    <div class="admin-panel" id="admin-panel" style="display: none;">
-        <h3>Admin Panel</h3>
-        <button id="close-admin">Close</button>
-        <h4>Add New Product</h4>
-        <form id="add-product-form">
-            <input type="text" id="product-name" placeholder="Product Name" required>
-            <input type="text" id="product-id" placeholder="Product ID" required>
-            <input type="number" id="product-price" placeholder="Product Price" required>
-            <button type="submit">Add Product</button>
-        </form>
-    </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="../application/productService.js" type="module"></script>
-    <script src="../business/billCalculator.js" type="module"></script>
-    <script src="app.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        $(document).ready(function() {
             const dateElement = document.getElementById('current-date');
             const currentDate = new Date();
             const options = { day: 'numeric', month: 'long', year: 'numeric' };
             dateElement.textContent = currentDate.toLocaleDateString('id-ID', options);
+        });
+
+        $('#admin-button').click(function() {
+            window.location.href = '/admin';
         });
     </script>
 </body>

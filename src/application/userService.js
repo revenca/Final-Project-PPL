@@ -1,5 +1,5 @@
 const userService = {
-    login: async function(credentials) {
+    async login(credentials) {
         const response = await fetch('/api/login', {
             method: 'POST',
             headers: {
@@ -7,12 +7,14 @@ const userService = {
             },
             body: JSON.stringify(credentials)
         });
+
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Login failed');
+            const error = await response.json();
+            throw new Error(error.error || 'Login failed');
         }
+
         return response.json();
     }
 };
 
-export default userService;
+module.exports = userService;

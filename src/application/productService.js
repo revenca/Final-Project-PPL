@@ -1,10 +1,13 @@
 const productService = {
-    getProducts: async function() {
+    async getProducts() {
         const response = await fetch('/api/products');
-        if (!response.ok) throw new Error('Failed to fetch products');
+        if (!response.ok) {
+            throw new Error('Failed to load products');
+        }
         return response.json();
     },
-    addProduct: async function(product) {
+
+    async addProduct(product) {
         const response = await fetch('/api/products', {
             method: 'POST',
             headers: {
@@ -12,16 +15,23 @@ const productService = {
             },
             body: JSON.stringify(product)
         });
-        if (!response.ok) throw new Error('Failed to add product');
-        return response.json();
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to add product');
+        }
     },
-    deleteProduct: async function(productId) {
+
+    async deleteProduct(productId) {
         const response = await fetch(`/api/products/${productId}`, {
             method: 'DELETE'
         });
-        if (!response.ok) throw new Error('Failed to delete product');
-        return response.json();
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to delete product');
+        }
     }
 };
 
-export default productService;
+module.exports = productService;
