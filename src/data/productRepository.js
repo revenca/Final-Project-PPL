@@ -1,3 +1,5 @@
+// my-project/data/productRepository.js
+
 const db = require('../infrastructure/db');
 
 const productRepository = {

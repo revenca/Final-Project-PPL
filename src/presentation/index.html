@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kasir Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css"> <!-- Link ke file CSS terpisah -->
 </head>
 <body>
     <div class="container">
+        <!-- Sidebar -->
         <div class="sidebar">
             <h2>Choose Category</h2>
             <div class="categories">
-                <button class="category active">All</button>
-                <button class="category">Coffee</button>
-                <button class="category">Non-Coffee</button>
+                <button class="btn btn-custom btn-custom-primary mb-2 category active">All</button>
+                <button class="btn btn-custom btn-custom-outline mb-2 category">Coffee</button>
+                <button class="btn btn-custom btn-custom-outline mb-2 category">Non-Coffee</button>
             </div>
             <h3>Menu</h3>
             <table>
@@ -22,32 +25,40 @@
                         <th>PRODUCT NAME</th>
                         <th>PRODUCT ID</th>
                         <th>PRICE</th>
-                        <!-- <th>DELETE</th> -->
                     </tr>
                 </thead>
                 <tbody id="menu-list">
-                    <!-- Menu items will be dynamically generated here -->
+                    <tr>
+                        <td>Latte</td>
+                        <td>123</td>
+                        <td>Rp. 20,000</td>
+                    </tr>
+                    <!-- Contoh item menu -->
                 </tbody>
             </table>
             <div class="quantity-selector">
-                <button class="decrease">-</button>
-                <input type="number" value="1" min="1">
-                <button class="increase">+</button>
+                <button class="btn btn-custom btn-custom-outline decrease">-</button>
+                <input type="number" class="form-control" value="1" min="1">
+                <button class="btn btn-custom btn-custom-outline increase">+</button>
             </div>
-            <button class="add-button">Add</button>
+            <button class="btn btn-custom btn-custom-success w-100 add-button">Add</button>
         </div>
+
+        <!-- Main Content -->
         <div class="main-content">
             <div class="header">
-                <div class="owner-info">
-                    <p>I'm the Owner</p>
-                    <p>Vanessa Christie</p>
+                <div>
+                    <p>Welcome</p>
+                    <p>ITS COFFE</p>
                 </div>
-                <div class="date" id="current-date"></div>
-                <button id="admin-button" onclick="window.open('login.html', '_blank')">Admin</button>
+                <div class="text-right">
+                    <div class="date" id="current-date"></div>
+                    <button id="admin-button" class="btn btn-custom btn-custom-warning" onclick="window.open('login.html', '_blank')">Admin</button>
+                </div>
             </div>
             <div class="order-info">
-                <button class="order-type active">Dine-In</button>
-                <button class="order-type">Take Away</button>
+                <button class="btn btn-custom btn-custom-info mr-2 order-type active">Dine-In</button>
+                <button class="btn btn-custom btn-custom-outline order-type">Take Away</button>
             </div>
             <div class="bills">
                 <h3>Bills</h3>
@@ -61,7 +72,14 @@
                         </tr>
                     </thead>
                     <tbody id="bill-list">
-                        <!-- Bill items will be dynamically generated here -->
+                        <!-- Example of dynamically generated bill item -->
+                        <tr>
+                            <td>kopialbin</td>
+                            <td>1</td>
+                            <td>Rp. 12345</td>
+                            <td><button class="btn btn-custom btn-custom-danger delete-bill-item">Delete</button></td>
+                        </tr>
+                        <!-- Contoh item tagihan -->
                     </tbody>
                 </table>
                 <div class="summary">
@@ -69,24 +87,27 @@
                     <p>PPN: Rp. <span id="ppn">0</span></p>
                     <p>Total: Rp. <span id="total">0</span></p>
                 </div>
-                <button class="checkout-button">Checkout</button>
+                <button class="btn btn-custom btn-custom-primary btn-custom-block checkout-button">Checkout</button>
             </div>
         </div>
     </div>
 
-    <div class="admin-panel" id="admin-panel" style="display: none;">
+    <div class="admin-panel" id="admin-panel">
         <h3>Admin Panel</h3>
-        <button id="close-admin">Close</button>
+        <button id="close-admin" class="btn btn-custom btn-custom-secondary">Close</button>
         <h4>Add New Product</h4>
         <form id="add-product-form">
-            <input type="text" id="product-name" placeholder="Product Name" required>
-            <input type="text" id="product-id" placeholder="Product ID" required>
-            <input type="number" id="product-price" placeholder="Product Price" required>
-            <button type="submit">Add Product</button>
+            <input type="text" id="product-name" class="form-control mb-2" placeholder="Product Name" required>
+            <input type="text" id="product-id" class="form-control mb-2" placeholder="Product ID" required>
+            <input type="number" id="product-price" class="form-control mb-2" placeholder="Product Price" required>
+            <button type="submit" class="btn btn-custom btn-custom-success">Add Product</button>
         </form>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script type="module" src="../application/productService.js"></script>
     <script type="module" src="../business/billCalculator.js"></script>
     <script type="module" src="app.js"></script>

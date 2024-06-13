@@ -1,3 +1,5 @@
+// my-project/presentation/app.js
+
 import { productService } from '../application/productService.js';
 import { calculateBill } from '../business/billCalculator.js';
 

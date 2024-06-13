@@ -1,3 +1,10 @@
+/* General Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
@@ -8,36 +15,32 @@ body {
 .container {
     display: flex;
     height: 100vh;
+    overflow: hidden;
 }
 
 .sidebar {
     width: 30%;
     background-color: #f5deb3;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .main-content {
     width: 70%;
     background-color: #ffffff;
     padding: 20px;
+    overflow: auto;
 }
 
 .categories {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     margin-bottom: 20px;
 }
 
 .category {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 10px 20px;
-    cursor: pointer;
-}
-
-.category.active {
-    background-color: #f90;
-    color: #fff;
+    text-align: center;
 }
 
 table {
@@ -50,7 +53,6 @@ table th, table td {
     border: 1px solid #ccc;
     padding: 10px;
     text-align: left;
-    cursor: pointer;
 }
 
 table tr.selected {
@@ -64,9 +66,6 @@ table tr.selected {
 }
 
 .quantity-selector button {
-    background-color: #f90;
-    border: none;
-    color: #fff;
     padding: 10px;
     cursor: pointer;
 }
@@ -75,16 +74,6 @@ table tr.selected {
     width: 50px;
     text-align: center;
     margin: 0 10px;
-}
-
-.add-button {
-    background-color: #8b4513;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    width: 100%;
-    text-align: center;
 }
 
 .header {
@@ -98,87 +87,146 @@ table tr.selected {
     margin-bottom: 20px;
 }
 
-.order-type {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin-right: 10px;
-}
-
-.order-type.active {
-    background-color: #f90;
-    color: #fff;
-}
-
 .bills {
     border-top: 1px solid #ccc;
     padding-top: 20px;
+    overflow-x: auto;
 }
 
 .summary {
     margin-top: 20px;
 }
 
-.checkout-button {
-    background-color: #8b4513;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
+/* Custom Button Styles */
+.btn-custom {
+    border-radius: 10px; /* Border radius for rounded shape */
+    padding: 5px 10px; /* Padding for buttons */
+    font-size: 14px; /* Font size */
+    border: 1px solid transparent; /* Border */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transitions */
     cursor: pointer;
-    width: 100%;
     text-align: center;
 }
 
-.admin-panel, .login-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.btn-custom:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow effect on hover */
+}
+
+/* Variations for button colors */
+.btn-custom-primary {
+    background-color: #007bff; /* Bootstrap Primary color */
+    color: white;
+}
+
+.btn-custom-primary:hover {
+    background-color: #0056b3; /* Darker shade for hover */
+}
+
+.btn-custom-success {
+    background-color: #28a745; /* Bootstrap Success color */
+    color: white;
+}
+
+.btn-custom-success:hover {
+    background-color: #218838; /* Darker shade for hover */
+}
+
+.btn-custom-info {
+    background-color: #17a2b8; /* Bootstrap Info color */
+    color: white;
+}
+
+.btn-custom-info:hover {
+    background-color: #117a8b; /* Darker shade for hover */
+}
+
+.btn-custom-warning {
+    background-color: #ffc107; /* Bootstrap Warning color */
+    color: white;
+}
+
+.btn-custom-warning:hover {
+    background-color: #e0a800; /* Darker shade for hover */
+}
+
+.btn-custom-secondary {
+    background-color: #6c757d; /* Bootstrap Secondary color */
+    color: white;
+}
+
+.btn-custom-secondary:hover {
+    background-color: #5a6268; /* Darker shade for hover */
+}
+
+.btn-custom-danger {
+    background-color: #dc3545; /* Bootstrap Danger color */
+    color: white;
+}
+
+.btn-custom-danger:hover {
+    background-color: #c82333; /* Darker shade for hover */
+}
+
+.btn-custom-outline {
+    background-color: transparent;
+    border: 1px solid #6c757d; /* Border for outline buttons */
+    color: #6c757d;
+}
+
+.btn-custom-outline:hover {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-custom-block {
+    display: block;
+    width: 100%;
+}
+
+/* Specific styles for admin dashboard */
+.admin-container {
+    margin: auto;
+    max-width: 800px;
     padding: 20px;
 }
 
-.login-section h3, .admin-panel h3 {
+.card {
     margin-bottom: 20px;
 }
 
-form input, form button {
-    display: block;
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    font-size: 16px;
+.table th, .table td {
+    vertical-align: middle;
 }
 
-form button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
+.add-product-form .form-control {
+    margin-bottom: 10px;
 }
 
-form button:hover {
-    background-color: #45a049;
+.table .btn-custom {
+    font-size: 12px; /* Smaller font size for table buttons */
+    padding: 3px 8px; /* Smaller padding for table buttons */
 }
 
-#login-message {
-    color: red;
+/* Center header styles */
+.container h3 {
     text-align: center;
+    margin-bottom: 30px;
 }
 
-.product-list {
+/* Center login form */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.login-container form {
     width: 100%;
-    max-width: 600px;
-    margin: 20px auto;
-}
-
-button.delete-product {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
-button.delete-product:hover {
-    background-color: #d32f2f;
+    max-width: 400px;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }

@@ -1,3 +1,5 @@
+// my-project/application/productService.js
+
 export const productService = {
     getProducts: async function() {
         const response = await fetch('http://localhost:3000/api/products');
@@ -23,3 +25,4 @@ export const productService = {
         return response.json();
     }
 };
+
