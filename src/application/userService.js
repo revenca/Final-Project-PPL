@@ -1,6 +1,6 @@
-const userService = {
+export const userService = {
     async login(credentials) {
-        const response = await fetch('/api/login', {
+        const response = await fetch('http://localhost:3000/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -17,4 +17,3 @@ const userService = {
     }
 };
 
-module.exports = userService;
