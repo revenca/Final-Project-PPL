@@ -1,5 +1,3 @@
-// my-project/application/userService.js
-
 export const userService = {
     async login(credentials) {
         const response = await fetch('http://localhost:3000/api/login', {
