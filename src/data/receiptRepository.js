@@ -1,21 +1,28 @@
-const db = require('../infrastructure/db');
+const db = require('../infrastructure/db').db;
 
 const receiptRepository = {
-    getNextReceiptId: function(callback) {
-        db.get(`SELECT COALESCE(MAX(receiptId), 0) + 1 AS nextId FROM receipts`, [], (err, row) => {
-            if (err) return callback(err);
-            callback(null, row.nextId);
+    getNextReceiptId: (callback) => {
+        const sql = `SELECT MAX(receiptId) as receiptId FROM receipts`;
+        db.get(sql, [], (err, row) => {
+            if (err) {
+                callback(err);
+            } else {
+                const nextId = row.receiptId ? row.receiptId + 1 : 1;
+                callback(null, nextId);
+            }
         });
     },
-    save: function(receiptData, callback) {
-        const { receiptId, items, subtotal, ppn, total, orderType, paymentMethod, date } = receiptData;
-        db.run(`INSERT INTO receipts (receiptId, items, subtotal, ppn, total, orderType, paymentMethod, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
-            [receiptId, JSON.stringify(items), subtotal, ppn, total, orderType, paymentMethod, date], callback);
+    save: (receipt, callback) => {
+        const sql = `INSERT INTO receipts (receiptId, items, subtotal, ppn, total, orderType, paymentMethod, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        const params = [receipt.receiptId, receipt.items, receipt.subtotal, receipt.ppn, receipt.total, receipt.orderType, receipt.paymentMethod, receipt.date];
+        db.run(sql, params, (err) => {
+            callback(err);
+        });
     },
-    getById: function(receiptId, callback) {
-        db.get(`SELECT * FROM receipts WHERE receiptId = ?`, [receiptId], (err, row) => {
-            if (err) return callback(err);
-            callback(null, row);
+    getById: (id, callback) => {
+        const sql = `SELECT * FROM receipts WHERE receiptId = ?`;
+        db.get(sql, [id], (err, row) => {
+            callback(err, row);
         });
     }
 };
