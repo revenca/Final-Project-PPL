@@ -1,18 +1,24 @@
-// my-project/data/productRepository.js
-
-const db = require('../infrastructure/db');
+const db = require('../infrastructure/db').db;
 
 const productRepository = {
-    getAll: function(callback) {
-        db.all(`SELECT * FROM products`, [], callback);
+    add: (product, callback) => {
+        const sql = `INSERT INTO products (id, name, price, category) VALUES (?, ?, ?, ?)`;
+        const params = [product.id, product.name, product.price, product.category];
+        db.run(sql, params, (err) => {
+            callback(err);
+        });
     },
-    add: function(product, callback) {
-        const { id, name, price, category } = product;
-        db.run(`INSERT INTO products (id, name, price, category) VALUES (?, ?, ?, ?)`,
-            [id, name, price, category], callback);
+    getAll: (callback) => {
+        const sql = `SELECT * FROM products`;
+        db.all(sql, [], (err, rows) => {
+            callback(err, rows);
+        });
     },
-    delete: function(productId, callback) {
-        db.run(`DELETE FROM products WHERE id = ?`, [productId], callback);
+    delete: (id, callback) => {
+        const sql = `DELETE FROM products WHERE id = ?`;
+        db.run(sql, [id], (err) => {
+            callback(err);
+        });
     }
 };
 
