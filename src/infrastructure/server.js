@@ -7,10 +7,13 @@ const cors = require('cors');
 const productRepository = require('../data/productRepository');
 const userRepository = require('../data/userRepository');
 const receiptRepository = require('../data/receiptRepository');
-const db = require('./db');
+const db = require('./db');  // Singleton instance of the database
 
 const app = express();
-const PORT = 3000;
+const PORT = 3000; // Ubah menjadi konstanta 'PORT'
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -53,6 +56,14 @@ app.get('/admin', (req, res) => {
     } else {
         res.status(401).send('Unauthorized');
     }
+});
+
+app.get('/api/menu', (req, res) => {
+    const menu = [
+        { id: 1, name: 'Nasi Goreng', price: 15000 },
+        { id: 2, name: 'Mie Goreng', price: 13000 },
+    ];
+    res.json(menu);
 });
 
 app.post('/api/products', (req, res) => {
@@ -104,4 +115,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
-
